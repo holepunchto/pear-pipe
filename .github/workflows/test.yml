@@ -39,3 +39,6 @@ jobs:
 
       - name: Test
         run: npm test
+
+      - name: Test (Node)
+        run: npm run test:node

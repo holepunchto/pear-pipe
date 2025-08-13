@@ -1,9 +1,11 @@
 'use strict'
-const { isWindows } = require('which-runtime')
-const BarePipe = require('bare-pipe')
+const { isWindows, isBare } = require('which-runtime')
+const Pipe = isBare
+  ? require('bare-pipe')
+  : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
 const fs = require('fs')
 const FD = 3
-class PearPipe extends BarePipe {
+class PearPipe extends Pipe {
   #onexit () { global.Pear.exit() }
 
   #autoexit = true

@@ -1,7 +1,8 @@
 'use strict'
-global.Pear = { exit: () => { global.Bare.exit(0) } }
+const program = global.Bare ?? global.process
+global.Pear = { exit: () => { program.exit(0) } }
 
 const pipe = require('../..')()
 if (pipe === null) {
-  global.Bare.exit(1)
+  program.exit(1)
 }
