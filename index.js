@@ -1,5 +1,5 @@
 'use strict'
-const { isBare } = require('which-runtime')
+const { isWindows, isBare } = require('which-runtime')
 const Pipe = isBare
   ? require('bare-pipe')
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
@@ -29,8 +29,7 @@ module.exports = function pipe () {
   if (PIPE !== null) return PIPE
   let attached
   try {
-    attached = fs.fstatSync(FD)
-    attached = true
+    attached = isWindows ? fs.fstatSync(FD) ? true : false : fs.fstatSync(FD).isSocket()
   } catch {
     attached = false
   }
