@@ -1,5 +1,5 @@
 'use strict'
-const { isWindows, isBare } = require('which-runtime')
+const { isBare } = require('which-runtime')
 const Pipe = isBare
   ? require('bare-pipe')
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
