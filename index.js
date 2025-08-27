@@ -29,7 +29,8 @@ module.exports = function pipe () {
   if (PIPE !== null) return PIPE
   let attached
   try {
-    attached = isWindows ? fs.fstatSync(FD).isFIFO() : fs.fstatSync(FD).isSocket()
+    attached = fs.fstatSync(FD)
+    attached = true
   } catch {
     attached = false
   }
