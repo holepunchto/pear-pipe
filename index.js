@@ -27,7 +27,12 @@ class PearPipe extends Pipe {
 let PIPE = null
 module.exports = function pipe () {
   if (PIPE !== null) return PIPE
-  const attached = isWindows ? fs.fstatSync(FD).isFIFO() : fs.fstatSync(FD).isSocket()
+  let attached
+  try {
+    attached = isWindows ? !!fs.fstatSync(FD) : fs.fstatSync(FD).isSocket()
+  } catch {
+    attached = false
+  }
   if (attached === false) return null
   PIPE = new PearPipe()
   return PIPE
