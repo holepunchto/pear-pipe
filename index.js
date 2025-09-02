@@ -1,5 +1,5 @@
 'use strict'
-const { isWindows, isBare } = require('which-runtime')
+const { isWindows, isBare, isElectronRenderer } = require('which-runtime')
 const Pipe = isBare
   ? require('bare-pipe')
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
@@ -27,6 +27,7 @@ class PearPipe extends Pipe {
 let PIPE = null
 module.exports = function pipe () {
   if (PIPE !== null) return PIPE
+  if (isElectronRenderer) return getRendererPipe()
   let attached
   try {
     attached = isWindows ? !!fs.fstatSync(FD) : fs.fstatSync(FD).isSocket()
@@ -36,4 +37,20 @@ module.exports = function pipe () {
   if (attached === false) return null
   PIPE = new PearPipe()
   return PIPE
+}
+
+function getRendererPipe () {
+  const pipe = global.Pear?.[global.Pear?.constructor.IPC].pipe()
+  let autoexit = true
+  const onexit = () => global.Pear.exit()
+  Object.defineProperty(pipe, 'autoexit', {
+    get () { return autoexit },
+    set (v) {
+      autoexit = v
+      pipe.off('end', onexit)
+      if (autoexit) pipe.once('end', onexit)
+    },
+    configurable: true
+  })
+  return pipe
 }
