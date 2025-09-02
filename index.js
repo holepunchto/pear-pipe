@@ -40,7 +40,7 @@ module.exports = function pipe () {
 }
 
 function getRendererPipe () {
-  const pipe = global.Pear?.[global.Pear?.constructor.IPC].pipe()
+  const pipe = global.Pear?.[global.Pear?.constructor.IPC].pipe() ?? global.Pear?.[Symbol.for('pear.ipc')]
   let autoexit = true
   const onexit = () => global.Pear.exit()
   Object.defineProperty(pipe, 'autoexit', {
