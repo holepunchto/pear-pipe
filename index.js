@@ -1,5 +1,6 @@
 'use strict'
 const { isWindows, isBare, isElectronRenderer } = require('which-runtime')
+const Stream = require('streamx')
 const Pipe = isBare
   ? require('bare-pipe')
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
@@ -24,30 +25,39 @@ class PearPipe extends Pipe {
   }
 }
 
-class PearElectronPipe {
+class PearElectronPipe extends Stream.Duplex {
+  #pipe
+  #autoexit = true
+  #onexit = () => global.Pear.exit()
+
   constructor () {
-    const ipc = global.Pear?.[global.Pear?.constructor.IPC]
-    const pipe = ipc?.pipe()
+    super()
 
-    let autoexit = true
-    const onexit = () => global.Pear.exit()
+    const ipc = global.Pear?.[global.Pear?.constructor.IPC] 
+    this.#pipe = ipc.pipe()
 
-    Object.defineProperty(pipe, 'autoexit', {
-      get () {
-        return autoexit
-      },
-      set (v) {
-        autoexit = v
-        pipe.off('end', onexit)
-        if (autoexit) pipe.once('end', onexit)
-      },
-      configurable: true,
-      enumerable: true
-    })
+    this.#pipe.on('error', (err) => this.destroy(err))
+    this.#pipe.on('close', () => this.destroy())
+    this.#pipe.on('end', () => this.push(null))
 
-    pipe.autoexit = true
+    this.#pipe.on('data', (chunk) => this.push(chunk))
 
-    return pipe
+    this.autoexit = true
+  }
+
+  _read (cb) {
+    cb(null)
+  }
+
+  _write (chunk, callback) {
+    this.#pipe._write(chunk, callback)
+  }
+
+  get autoexit () { return this.#autoexit }
+  set autoexit (v) {
+    this.#autoexit = v
+    this.#pipe.off('end', this.#onexit)
+    if (v) this.#pipe.once('end', this.#onexit)
   }
 }
 
