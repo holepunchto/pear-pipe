@@ -25,7 +25,7 @@ class PearPipe extends Pipe {
 }
 
 class PearElectronPipe {
-  constructor() {
+  constructor () {
     const ipc = global.Pear?.[global.Pear?.constructor.IPC]
     const pipe = ipc?.pipe()
 
@@ -33,10 +33,10 @@ class PearElectronPipe {
     const onexit = () => global.Pear.exit()
 
     Object.defineProperty(pipe, 'autoexit', {
-      get() {
+      get () {
         return autoexit
       },
-      set(v) {
+      set (v) {
         autoexit = v
         pipe.off('end', onexit)
         if (autoexit) pipe.once('end', onexit)
@@ -50,8 +50,6 @@ class PearElectronPipe {
     return pipe
   }
 }
-
-
 
 let PIPE = null
 module.exports = function pipe () {
