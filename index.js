@@ -33,7 +33,6 @@ class PearElectronPipe {
     const ipc = global.Pear?.[global.Pear?.constructor.IPC] ?? global.Pear?.[Symbol.for('pear.ipc')]
     const pipe = ipc?.pipe ? ipc.pipe() : global.Pear.worker.pipe()
 
-    // Add methods to the pipe
     pipe.autoexit = true
     const onexit = () => global.Pear.exit()
     Object.defineProperty(pipe, 'setAutoexit', {
