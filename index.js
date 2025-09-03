@@ -37,16 +37,13 @@ class PearElectronPipe extends Stream.Duplex {
     this.#pipe = ipc.pipe()
 
     this.#pipe.on('error', (err) => this.destroy(err))
+    this.#pipe.on('finish', () => this.end())
     this.#pipe.on('close', () => this.destroy())
     this.#pipe.on('end', () => this.push(null))
 
     this.#pipe.on('data', (chunk) => this.push(chunk))
 
     this.autoexit = true
-  }
-
-  _read (cb) {
-    cb(null)
   }
 
   _write (chunk, callback) {
