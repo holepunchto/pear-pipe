@@ -33,7 +33,7 @@ class PearElectronPipe extends Stream.Duplex {
   constructor () {
     super()
 
-    const ipc = global.Pear?.[global.Pear?.constructor.IPC] 
+    const ipc = global.Pear?.[global.Pear?.constructor.IPC]
     this.#pipe = ipc.pipe()
 
     this.#pipe.on('error', (err) => this.destroy(err))
