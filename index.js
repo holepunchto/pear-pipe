@@ -1,6 +1,6 @@
 'use strict'
 const { isWindows, isBare, isElectronRenderer } = require('which-runtime')
-const Stream = require('streamx')
+const { Duplex } = require('streamx')
 const Pipe = isBare
   ? require('bare-pipe')
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
@@ -25,7 +25,7 @@ class PearPipe extends Pipe {
   }
 }
 
-class PearElectronPipe extends Stream.Duplex {
+class PearElectronPipe extends Duplex {
   #pipe
   #autoexit = true
   #onexit = () => global.Pear.exit()
@@ -36,18 +36,17 @@ class PearElectronPipe extends Stream.Duplex {
     const ipc = global.Pear?.[global.Pear?.constructor.IPC]
     this.#pipe = ipc.pipe()
 
-    this.#pipe.on('error', (err) => this.destroy(err))
-    this.#pipe.on('finish', () => this.end())
-    this.#pipe.on('end', () => this.push(null))
+    this.#pipe.once('error', (err) => this.destroy(err))
+    this.#pipe.once('finish', () => this.end())
+    this.#pipe.once('close', () => this.destroy())
+    this.#pipe.once('end', () => this.push(null))
 
-    this.#pipe.on('data', (chunk) => this.push(chunk))
+    this.#pipe.on('data', (data) => this.push(data))
 
     this.autoexit = true
   }
 
-  write (chunk) {
-    this.#pipe.write(chunk)
-  }
+  _write (data, cb) { return this.#pipe.write(data, cb) }
 
   get autoexit () { return this.#autoexit }
   set autoexit (v) {
