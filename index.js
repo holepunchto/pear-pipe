@@ -24,37 +24,41 @@ class PearPipe extends Pipe {
   }
 }
 
+class PearElectronPipe {
+  #autoexit = true
+
+  get autoexit() { return this.#autoexit }
+
+  constructor() {
+    const ipc = global.Pear?.[global.Pear?.constructor.IPC] ?? global.Pear?.[Symbol.for('pear.ipc')]
+    const pipe = ipc?.pipe ? ipc.pipe() : global.Pear.worker.pipe()
+
+    // Add methods to the pipe
+    pipe.autoexit = true
+    const onexit = () => global.Pear.exit()
+    Object.defineProperty(pipe, 'setAutoexit', {
+      value: (v) => {
+        pipe.off('end', onexit)
+        if (v) pipe.once('end', onexit)
+        pipe.autoexit = v
+      }
+    })
+
+    return pipe
+  }
+}
+
+
 let PIPE = null
 module.exports = function pipe () {
   if (PIPE !== null) return PIPE
-  if (isElectronRenderer) return getRendererPipe()
   let attached
   try {
     attached = isWindows ? !!fs.fstatSync(FD) : fs.fstatSync(FD).isSocket()
   } catch {
     attached = false
   }
-  if (attached === false) return null
-  PIPE = new PearPipe()
+  if (attached === false && !isElectronRenderer) return null
+  PIPE = isElectronRenderer ? new PearElectronPipe() : new PearPipe()
   return PIPE
-}
-
-function getRendererPipe () {
-  const pipe = global.Pear?.[global.Pear?.constructor.IPC].pipe()
-  if (!pipe) {
-    console.warn('electron renderer pipe is not supported by pear v1')
-    return null
-  }
-  let autoexit = true
-  const onexit = () => global.Pear.exit()
-  Object.defineProperty(pipe, 'autoexit', {
-    get () { return autoexit },
-    set (v) {
-      autoexit = v
-      pipe.off('end', onexit)
-      if (autoexit) pipe.once('end', onexit)
-    },
-    configurable: true
-  })
-  return pipe
 }
