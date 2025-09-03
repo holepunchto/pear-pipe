@@ -41,8 +41,8 @@ module.exports = function pipe () {
 
 function getRendererPipe () {
   const pipe = global.Pear?.[global.Pear?.constructor.IPC].pipe()
-  if (!pipe){
-    console.warn('electron rendere pipe not supported by pear v1')
+  if (!pipe) {
+    console.warn('electron renderer pipe is not supported by pear v1')
     return null
   }
   let autoexit = true
