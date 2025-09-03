@@ -25,27 +25,32 @@ class PearPipe extends Pipe {
 }
 
 class PearElectronPipe {
-  #autoexit = true
-
-  get autoexit() { return this.#autoexit }
-
   constructor() {
-    const ipc = global.Pear?.[global.Pear?.constructor.IPC] ?? global.Pear?.[Symbol.for('pear.ipc')]
-    const pipe = ipc?.pipe ? ipc.pipe() : global.Pear.worker.pipe()
+    const ipc = global.Pear?.[global.Pear?.constructor.IPC]
+    const pipe = ipc?.pipe()
+
+    let autoexit = true
+    const onexit = () => global.Pear.exit()
+
+    Object.defineProperty(pipe, 'autoexit', {
+      get() {
+        return autoexit
+      },
+      set(v) {
+        autoexit = v
+        pipe.off('end', onexit)
+        if (autoexit) pipe.once('end', onexit)
+      },
+      configurable: true,
+      enumerable: true
+    })
 
     pipe.autoexit = true
-    const onexit = () => global.Pear.exit()
-    Object.defineProperty(pipe, 'setAutoexit', {
-      value: (v) => {
-        pipe.off('end', onexit)
-        if (v) pipe.once('end', onexit)
-        pipe.autoexit = v
-      }
-    })
 
     return pipe
   }
 }
+
 
 
 let PIPE = null
