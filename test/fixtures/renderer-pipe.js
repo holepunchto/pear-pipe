@@ -17,12 +17,12 @@ const Pipe = isBare
 class API {
   static IPC = Symbol('ipc')
 
-  constructor() {
+  constructor () {
     this[API.IPC] = {
-      pipe() {
-        return new Pipe(3);
+      pipe () {
+        return new Pipe(3)
       }
-    };
+    }
   }
 
   exit () {}
