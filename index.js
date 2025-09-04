@@ -49,10 +49,11 @@ class PearElectronPipe extends Duplex {
   _write (data, cb) { return this.#pipe.write(data, cb) }
 
   get autoexit () { return this.#autoexit }
+
   set autoexit (v) {
     this.#autoexit = v
     this.#pipe.off('end', this.#onexit)
-    if (v) this.#pipe.once('end', this.#onexit)
+    if (this.#autoexit) this.#pipe.once('end', this.#onexit)
   }
 }
 
