@@ -14,18 +14,20 @@ const Pipe = isBare
   ? require('bare-pipe')
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
 
-const pipeMock = new Pipe(3)
+class API {
+  static IPC = Symbol('ipc')
 
-if (!global.Pear) global.Pear = {}
-if (!global.Pear.constructor) global.Pear.constructor = {}
-if (!global.Pear.constructor.IPC) global.Pear.constructor.IPC = Symbol('ipc')
-if (!global.Pear.exit) global.Pear.exit = () => pipeMock.destroy()
-
-global.Pear[global.Pear.constructor.IPC] = {
-  pipe () {
-    return pipeMock
+  constructor() {
+    this[API.IPC] = {
+      pipe() {
+        return new Pipe(3);
+      }
+    };
   }
+
+  exit () {}
 }
+global.Pear = new API()
 
 const pipe = require('../..')()
 
