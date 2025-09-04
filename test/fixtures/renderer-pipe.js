@@ -29,7 +29,6 @@ class API {
 }
 global.Pear = new API()
 
-const pipe = require('../..')()
-
 // echo
+const pipe = require('../..')()
 pipe.on('data', (data) => pipe.write(data))
