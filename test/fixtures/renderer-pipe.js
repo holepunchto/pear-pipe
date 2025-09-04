@@ -21,7 +21,7 @@ if (!global.Pear) global.Pear = {}
 if (!global.Pear.constructor) global.Pear.constructor = {}
 if (!global.Pear.constructor.IPC) global.Pear.constructor.IPC = Symbol('ipc')
 
-global.Pear[global.Pear?.constructor.IPC] = {
+global.Pear[global.Pear.constructor.IPC] = {
   pipe () {
     return pipe
   }
