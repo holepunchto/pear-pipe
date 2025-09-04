@@ -41,3 +41,15 @@ test('pipe.autoexit=false', (t) => {
   sp.on('exit', (code) => t.is(code, 0))
   pipe.end()
 })
+
+test('returns electron ipc pipe in renderer enviornment', (t) => {
+  t.plan(1)
+  const sp = spawn(program.argv[0], [path.join(__dirname, 'fixtures', 'renderer-pipe.js')], {
+    stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
+    windowsHide: true
+  })
+  const pipe = sp.stdio[3]
+  t.teardown(() => pipe.destroy())
+  pipe.on('data', (data) => t.is(data.toString(), 'hello'))
+  pipe.write('hello')
+})
