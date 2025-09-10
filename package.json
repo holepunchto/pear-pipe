@@ -5,7 +5,10 @@
   "type": "commonjs",
   "description": "Pear parent app connected bare-pipe",
   "license": "Apache-2.0",
-  "files": [],
+  "files": [
+    "index.js",
+    "lib/"
+  ],
   "scripts": {
     "test:gen": "brittle -r test/all.js test/*.test.js",
     "test": "brittle-bare --coverage test/all.js",
