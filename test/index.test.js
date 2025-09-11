@@ -2,7 +2,7 @@
 const test = require('brittle')
 const { spawn } = require('child_process')
 const path = require('path')
-const pipe = require('..')
+const pipe = require('./helper').requirePipe()
 const program = global.Bare ?? global.process
 test('when spawned without fd 3, returns null', (t) => {
   t.is(pipe(), null)

@@ -24,15 +24,17 @@ class PearPipe extends require('bare-pipe') {
 if (isBareKit) exports.args = [...global.Bare.argv]
 
 let PIPE = null
-module.exports = isBareKit ? () => global.BareKit.IPC : function pipe () {
-  if (PIPE !== null) return PIPE
-  let attached
-  try {
-    attached = isWindows ? !!fs.fstatSync(FD) : fs.fstatSync(FD).isSocket()
-  } catch {
-    attached = false
+module.exports = isBareKit
+  ? () => global.BareKit.IPC
+  : function pipe () {
+    if (PIPE !== null) return PIPE
+    let attached
+    try {
+      attached = isWindows ? !!fs.fstatSync(FD) : fs.fstatSync(FD).isSocket()
+    } catch {
+      attached = false
+    }
+    if (attached === false) return null
+    PIPE = new PearPipe()
+    return PIPE
   }
-  if (attached === false) return null
-  PIPE = new PearPipe()
-  return PIPE
-}
