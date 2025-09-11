@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "files": [
     "index.js",
-    "lib/"
+    "index.default.js"
   ],
   "scripts": {
     "test:gen": "brittle -r test/all.js test/*.test.js",
