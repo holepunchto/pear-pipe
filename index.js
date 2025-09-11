@@ -24,7 +24,7 @@ class PearPipe extends require('bare-pipe') {
 if (isBareKit) exports.args = [...global.Bare.argv]
 
 let PIPE = null
-module.exports = function pipe () {
+module.exports = isBareKit ? () => global.BareKit.IPC : function pipe () {
   if (PIPE !== null) return PIPE
   let attached
   try {
@@ -33,6 +33,6 @@ module.exports = function pipe () {
     attached = false
   }
   if (attached === false) return null
-  PIPE = isBareKit ? global.BareKit.IPC : new PearPipe()
+  PIPE = new PearPipe()
   return PIPE
 }
