@@ -24,9 +24,8 @@ class PearPipe extends Pipe {
 
 if (isBareKit) exports.args = [...global.Bare.argv]
 
-let PIPE = null
+let PIPE = global.BareKit?.IPC ?? null
 module.exports = function pipe () {
-  if (isBareKit) return global.BareKit.IPC
   if (PIPE !== null) return PIPE
   let attached
   try {
