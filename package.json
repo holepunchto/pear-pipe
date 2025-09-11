@@ -25,9 +25,9 @@
     "path": {
       "bare": "bare-path"
     },
-    "#lib":{
-      "bare-kit": "./lib/bare-kit.js",
-      "default": "./lib/pear.js"
+    "#main": {
+      "bare": "./index.js",
+      "default": "./index.default.js"
     }
   },
   "devDependencies": {

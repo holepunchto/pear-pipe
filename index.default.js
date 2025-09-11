@@ -1,12 +1,10 @@
 'use strict'
-const { isWindows, isBare, isElectronRenderer } = require('which-runtime')
+const { isWindows, isElectronRenderer } = require('which-runtime')
 const { Duplex } = require('streamx')
-const Pipe = isBare
-  ? require('bare-pipe')
-  : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
+const Pipe = class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
 const fs = require('fs')
 const FD = 3
-class PearPipe extends Pipe {
+class NodePipe extends Pipe {
   #onexit () { global.Pear.exit() }
 
   #autoexit = true
@@ -67,6 +65,6 @@ module.exports = function pipe () {
     attached = false
   }
   if (attached === false && !isElectronRenderer) return null
-  PIPE = isElectronRenderer ? new PearElectronPipe() : new PearPipe()
+  PIPE = isElectronRenderer ? new PearElectronPipe() : new NodePipe()
   return PIPE
 }
