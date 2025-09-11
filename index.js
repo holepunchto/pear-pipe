@@ -2,7 +2,8 @@
 const { isWindows, isBareKit } = require('which-runtime')
 const fs = require('fs')
 const FD = 3
-class PearPipe extends require('bare-pipe') {
+const Pipe = require('bare-pipe')
+class PearPipe extends Pipe {
   #onexit () { global.Pear.exit() }
 
   #autoexit = true
@@ -24,17 +25,16 @@ class PearPipe extends require('bare-pipe') {
 if (isBareKit) exports.args = [...global.Bare.argv]
 
 let PIPE = null
-module.exports = isBareKit
-  ? () => global.BareKit.IPC
-  : function pipe () {
-    if (PIPE !== null) return PIPE
-    let attached
-    try {
-      attached = isWindows ? !!fs.fstatSync(FD) : fs.fstatSync(FD).isSocket()
-    } catch {
-      attached = false
-    }
-    if (attached === false) return null
-    PIPE = new PearPipe()
-    return PIPE
+module.exports = function pipe () {
+  if (isBareKit) return global.BareKit.IPC
+  if (PIPE !== null) return PIPE
+  let attached
+  try {
+    attached = isWindows ? !!fs.fstatSync(FD) : fs.fstatSync(FD).isSocket()
+  } catch {
+    attached = false
   }
+  if (attached === false) return null
+  PIPE = new PearPipe()
+  return PIPE
+}
