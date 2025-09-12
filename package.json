@@ -1,11 +1,20 @@
 {
   "name": "pear-pipe",
   "version": "1.0.3",
-  "main": "index.js",
+  "main": "index.default.js",
+  "exports": {
+    ".": {
+      "bare": "./index.js",
+      "default": "./index.default.js"
+    }
+  },
   "type": "commonjs",
   "description": "Pear parent app connected bare-pipe",
   "license": "Apache-2.0",
-  "files": [],
+  "files": [
+    "index.js",
+    "index.default.js"
+  ],
   "scripts": {
     "test:gen": "brittle -r test/all.js test/*.test.js",
     "test": "brittle-bare --coverage test/all.js",

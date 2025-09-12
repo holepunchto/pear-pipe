@@ -2,7 +2,7 @@
 const program = global.Bare ?? global.process
 global.Pear = { exit: () => { program.exit(0) } }
 
-const pipe = require('../..')()
+const pipe = require('../helper').requirePipe()()
 if (pipe === null) {
   program.exit(1)
 }
