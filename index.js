@@ -3,23 +3,31 @@ const { isWindows, isBare, isElectronRenderer } = require('which-runtime')
 const { Duplex } = require('streamx')
 const Pipe = isBare
   ? require('bare-pipe')
-  : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
+  : class Pipe extends require('net').Socket {
+      constructor(fd) {
+        super({ fd })
+      }
+    }
 const fs = require('fs')
 const FD = 3
 class PearPipe extends Pipe {
-  #onexit () { global.Pear.exit() }
+  #onexit() {
+    global.Pear.exit()
+  }
 
   #autoexit = true
 
-  get autoexit () { return this.#autoexit }
+  get autoexit() {
+    return this.#autoexit
+  }
 
-  set autoexit (v) {
+  set autoexit(v) {
     this.#autoexit = v
     this.off('end', this.#onexit)
     if (this.#autoexit) this.once('end', this.#onexit)
   }
 
-  constructor () {
+  constructor() {
     super(FD)
     this.autoexit = true
   }
@@ -30,7 +38,7 @@ class PearElectronPipe extends Duplex {
   #autoexit = true
   #onexit = () => global.Pear.exit()
 
-  constructor () {
+  constructor() {
     super()
 
     const ipc = global.Pear?.[global.Pear?.constructor.IPC]
@@ -46,11 +54,15 @@ class PearElectronPipe extends Duplex {
     this.autoexit = true
   }
 
-  _write (data, cb) { return this.#pipe.write(data, cb) }
+  _write(data, cb) {
+    return this.#pipe.write(data, cb)
+  }
 
-  get autoexit () { return this.#autoexit }
+  get autoexit() {
+    return this.#autoexit
+  }
 
-  set autoexit (v) {
+  set autoexit(v) {
     this.#autoexit = v
     this.#pipe.off('end', this.#onexit)
     if (this.#autoexit) this.#pipe.once('end', this.#onexit)
@@ -58,7 +70,7 @@ class PearElectronPipe extends Duplex {
 }
 
 let PIPE = null
-module.exports = function pipe () {
+module.exports = function pipe() {
   if (PIPE !== null) return PIPE
   let attached
   try {
