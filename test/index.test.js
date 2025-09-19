@@ -9,10 +9,14 @@ test('when spawned without fd 3, returns null', (t) => {
 })
 
 test('when spawned with fd 3, returns a pipe', (t) => {
-  const sp = spawn(program.argv[0], [path.join(__dirname, 'fixtures', 'echo.js')], {
-    stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
-    windowsHide: true
-  })
+  const sp = spawn(
+    program.argv[0],
+    [path.join(__dirname, 'fixtures', 'echo.js')],
+    {
+      stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
+      windowsHide: true
+    }
+  )
   t.teardown(() => sp.kill())
   t.plan(1)
   const pipe = sp.stdio[3]
@@ -22,10 +26,14 @@ test('when spawned with fd 3, returns a pipe', (t) => {
 
 test('pipe.autoexit=true (default)', (t) => {
   t.plan(1)
-  const sp = spawn(program.argv[0], [path.join(__dirname, 'fixtures', 'autoexit.js')], {
-    stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
-    windowsHide: true
-  })
+  const sp = spawn(
+    program.argv[0],
+    [path.join(__dirname, 'fixtures', 'autoexit.js')],
+    {
+      stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
+      windowsHide: true
+    }
+  )
   const pipe = sp.stdio[3]
   sp.on('exit', (code) => t.is(code, 0))
   pipe.end()
@@ -33,10 +41,14 @@ test('pipe.autoexit=true (default)', (t) => {
 
 test('pipe.autoexit=false', (t) => {
   t.plan(1)
-  const sp = spawn(program.argv[0], [path.join(__dirname, 'fixtures', 'graceful.js')], {
-    stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
-    windowsHide: true
-  })
+  const sp = spawn(
+    program.argv[0],
+    [path.join(__dirname, 'fixtures', 'graceful.js')],
+    {
+      stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
+      windowsHide: true
+    }
+  )
   const pipe = sp.stdio[3]
   sp.on('exit', (code) => t.is(code, 0))
   pipe.end()
@@ -44,10 +56,14 @@ test('pipe.autoexit=false', (t) => {
 
 test('returns electron ipc pipe in renderer enviornment', (t) => {
   t.plan(1)
-  const sp = spawn(program.argv[0], [path.join(__dirname, 'fixtures', 'renderer-pipe.js')], {
-    stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
-    windowsHide: true
-  })
+  const sp = spawn(
+    program.argv[0],
+    [path.join(__dirname, 'fixtures', 'renderer-pipe.js')],
+    {
+      stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
+      windowsHide: true
+    }
+  )
   const pipe = sp.stdio[3]
   t.teardown(() => pipe.destroy())
   pipe.on('data', (data) => t.is(data.toString(), 'hello'))

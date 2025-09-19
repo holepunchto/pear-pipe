@@ -12,20 +12,24 @@ global.process = {
 const { isBare } = require('which-runtime')
 const Pipe = isBare
   ? require('bare-pipe')
-  : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
+  : class Pipe extends require('net').Socket {
+      constructor(fd) {
+        super({ fd })
+      }
+    }
 
 class API {
   static IPC = Symbol('ipc')
 
-  constructor () {
+  constructor() {
     this[API.IPC] = {
-      pipe () {
+      pipe() {
         return new Pipe(3)
       }
     }
   }
 
-  exit () {}
+  exit() {}
 }
 global.Pear = new API()
 
