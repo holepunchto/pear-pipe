@@ -55,7 +55,11 @@ class PearElectronPipe extends Duplex {
   }
 
   _write(data, cb) {
-    return this.#pipe.write(data, cb)
+    if (!this.#pipe.write(data)) {
+      this.#pipe.once('drain', cb)
+    } else {
+      cb()
+    }
   }
 
   get autoexit() {

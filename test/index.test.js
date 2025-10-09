@@ -69,3 +69,22 @@ test('returns electron ipc pipe in renderer enviornment', (t) => {
   pipe.on('data', (data) => t.is(data.toString(), 'hello'))
   pipe.write('hello')
 })
+
+test('electron pipe can do consecutive writes', (t) => {
+  t.plan(2)
+  const sp = spawn(
+    program.argv[0],
+    [path.join(__dirname, 'fixtures', 'renderer-pipe.js')],
+    {
+      stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
+      windowsHide: true
+    }
+  )
+  const pipe = sp.stdio[3]
+  t.teardown(() => pipe.destroy())
+  pipe.on('data', (data) => {
+    t.is(data.length, 32)
+  })
+  pipe.write(Buffer.alloc(32))
+  setTimeout(() => pipe.write(Buffer.alloc(32)), 1000)
+})
