@@ -1,6 +1,6 @@
 {
   "name": "pear-pipe",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "index.js",
   "type": "commonjs",
   "description": "Pear parent app connected bare-pipe",
