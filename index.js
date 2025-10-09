@@ -46,9 +46,7 @@ class PearElectronPipe extends Duplex {
 
     this.#pipe.once('error', (err) => this.destroy(err))
     this.#pipe.once('finish', () => this.end())
-    this.#pipe.once('close', () => this.destroy())
     this.#pipe.once('end', () => this.push(null))
-
     this.#pipe.on('data', (data) => this.push(data))
     this.#pipe.on('drain', this._ondrain.bind(this))
     this._continueWrite = null
@@ -65,6 +63,16 @@ class PearElectronPipe extends Duplex {
   _write(data, cb) {
     if (!this.#pipe.write(data)) this._continueWrite = cb
     else cb(null)
+  }
+
+  _predestroy() {
+    this._ondrain()
+    this.#pipe.destroy(new Error('Stream destroyed'))
+  }
+
+  _final(cb) {
+    this.#pipe.end()
+    cb(null)
   }
 
   get autoexit() {
