@@ -50,16 +50,21 @@ class PearElectronPipe extends Duplex {
     this.#pipe.once('end', () => this.push(null))
 
     this.#pipe.on('data', (data) => this.push(data))
+    this.#pipe.on('drain', this._ondrain.bind(this))
+    this._continueWrite = null
 
     this.autoexit = true
   }
 
+  _ondrain() {
+    const cb = this._continueWrite
+    this._continueWrite = null
+    cb(null)
+  }
+
   _write(data, cb) {
-    if (!this.#pipe.write(data)) {
-      this.#pipe.once('drain', cb)
-    } else {
-      cb()
-    }
+    if (!this.#pipe.write(data)) this._continueWrite = cb
+    else cb(null)
   }
 
   get autoexit() {
