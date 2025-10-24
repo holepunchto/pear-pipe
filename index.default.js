@@ -1,7 +1,7 @@
 'use strict'
 const { isWindows, isElectronRenderer } = require('which-runtime')
 const { Duplex } = require('streamx')
-const Pipe = class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
+const Pipe = require('fd-pipe')
 const fs = require('fs')
 const FD = 3
 class NodePipe extends Pipe {
