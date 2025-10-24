@@ -41,6 +41,17 @@ class ThreadPipe {
   write(data) {
     return this.#writePipe.write(data)
   }
+  
+  // is this correct?
+  destroy() {
+    this.#readPipe.destroy()
+    this.#writePipe.destroy()
+  }
+
+  end() {
+    this.#writePipe.end()
+    this.#readPipe.end()
+  }
 
 }
 
