@@ -1,13 +1,7 @@
 'use strict'
-const { isWindows, isBare, isElectronRenderer } = require('which-runtime')
+const { isWindows, isElectronRenderer } = require('which-runtime')
 const { Duplex } = require('streamx')
-const Pipe = isBare
-  ? require('bare-pipe')
-  : class Pipe extends require('net').Socket {
-      constructor(fd) {
-        super({ fd })
-      }
-    }
+const Pipe = require('#pipe')
 const fs = require('fs')
 const FD = 3
 class PearPipe extends Pipe {
@@ -95,6 +89,7 @@ module.exports = function pipe() {
   } catch {
     attached = false
   }
+  if  (!!global?.process?.channel) return // spawned by Node.js with stdio ipc set on stdio[3]
   if (attached === false && !isElectronRenderer) return null
   PIPE = isElectronRenderer ? new PearElectronPipe() : new PearPipe()
   return PIPE

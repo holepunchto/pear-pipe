@@ -37,8 +37,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test
-        run: npm test
+      - name: Test (Bare)
+        run: npm run test:bare
 
       - name: Test (Node)
         run: npm run test:node
