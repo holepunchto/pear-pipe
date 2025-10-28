@@ -5,7 +5,10 @@
   "type": "commonjs",
   "description": "Pear parent app connected bare-pipe",
   "license": "Apache-2.0",
-  "files": ["bare/", "node/"],
+  "files": [
+    "bare/",
+    "node/"
+  ],
   "scripts": {
     "format": "prettier --write .",
     "lint": "prettier --check .",
@@ -17,7 +20,7 @@
   "imports": {
     "#pipe": {
       "bare": "./bare/pipe.js",
-      "default": "./node/pipe.js" 
+      "default": "./node/pipe.js"
     },
     "child_process": {
       "bare": "bare-subprocess"

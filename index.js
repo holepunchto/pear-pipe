@@ -89,7 +89,7 @@ module.exports = function pipe() {
   } catch {
     attached = false
   }
-  if  (!!global?.process?.channel) return // spawned by Node.js with stdio ipc set on stdio[3]
+  if (!!global?.process?.channel) return // spawned by Node.js with stdio ipc set on stdio[3]
   if (attached === false && !isElectronRenderer) return null
   PIPE = isElectronRenderer ? new PearElectronPipe() : new PearPipe()
   return PIPE
