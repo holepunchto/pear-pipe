@@ -1,21 +1,12 @@
 {
   "name": "pear-pipe",
   "version": "1.0.6",
-  "main": "index.default.js",
-  "exports": {
-    ".": {
-      "bare": "./index.js",
-      "expo": "./index.js",
-      "default": "./index.default.js"
-    },
-    "./package": "./package.json"
-  },
+  "main": "index.js",
   "type": "commonjs",
   "description": "Pear parent app connected bare-pipe",
   "license": "Apache-2.0",
   "files": [
     "index.js",
-    "index.default.js",
     "bare/",
     "node/"
   ],
