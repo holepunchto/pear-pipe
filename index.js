@@ -115,8 +115,8 @@ class ThreadPipe {
 
 }
 
-if (isBareKit) exports.args = [...Bare.argv]
-else if (!isPear) exports.args = Bare.argv.slice(2)
+if (isBareKit) exports.args = [...global.Bare?.argv]
+else if (!isPear) exports.args = global.Bare?.argv.slice(2)
 
 let PIPE = isMobile ? global.BareKit?.IPC ?? new ThreadPipe() : null
 module.exports = function pipe() {
