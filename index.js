@@ -1,5 +1,6 @@
 'use strict'
 const { isWindows, isElectronRenderer, isBareKit, isPear, isIOS, isAndroid, isReactNative, isExpo } = require('which-runtime')
+const { Duplex } = require('streamx')
 const Pipe = require('#pipe')
 const fs = require('fs')
 const FD = 3
