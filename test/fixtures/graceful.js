@@ -7,7 +7,7 @@ global.Pear = {
   }
 }
 
-const pipe = require('../helper').requirePipe()()
+const pipe = require('../..')()
 pipe.on('end', () => pipe.end())
 if (pipe === null) {
   program.exit(1)
