@@ -6,7 +6,6 @@
   "description": "Pear parent app connected bare-pipe",
   "license": "Apache-2.0",
   "files": [
-    "index.js",
     "bare/",
     "node/"
   ],
