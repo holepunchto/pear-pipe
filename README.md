@@ -18,7 +18,7 @@ if (pipe === null) {
 
 ### `const pipe = require('pear-pipe')` | `import pipe from 'pear-pipe'` `pipe() -> PearPipe|null`
 
-Returns `null` if the app doesn't have a parent app. 
+Returns `null` if the app doesn't have a parent app.
 
 If an app has been run with `pear-run`, returns `PearPipe` instance.
 

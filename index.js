@@ -1,26 +1,83 @@
 'use strict'
-const { isWindows, isBareKit, isPear, isIOS, isAndroid, isReactNative, isExpo } = require('which-runtime')
+const { isWindows, isElectronRenderer, isBareKit, isPear, isIOS, isAndroid, isReactNative, isExpo } = require('which-runtime')
+const Pipe = require('#pipe')
 const fs = require('fs')
 const FD = 3
-const Pipe = require('bare-pipe')
 const isMobile = isIOS || isAndroid || isReactNative || isExpo
 
 class PearPipe extends Pipe {
-  #onexit () { isPear && global.Pear.exit() }
+  #onexit() {
+    global.Pear.exit()
+  }
 
   #autoexit = true
 
-  get autoexit () { return this.#autoexit }
+  get autoexit() {
+    return this.#autoexit
+  }
 
-  set autoexit (v) {
+  set autoexit(v) {
     this.#autoexit = v
     this.off('end', this.#onexit)
     if (this.#autoexit) this.once('end', this.#onexit)
   }
 
-  constructor () {
+  constructor() {
     super(FD)
     this.autoexit = true
+  }
+}
+
+class PearElectronPipe extends Duplex {
+  #pipe
+  #autoexit = true
+  #onexit = () => global.Pear.exit()
+
+  constructor() {
+    super()
+
+    const ipc = global.Pear?.[global.Pear?.constructor.IPC]
+    this.#pipe = ipc.pipe()
+
+    this.#pipe.once('error', (err) => this.destroy(err))
+    this.#pipe.once('finish', () => this.end())
+    this.#pipe.once('end', () => this.push(null))
+    this.#pipe.on('data', (data) => this.push(data))
+    this.#pipe.on('drain', this._ondrain.bind(this))
+    this._continueWrite = null
+
+    this.autoexit = true
+  }
+
+  _ondrain() {
+    const cb = this._continueWrite
+    this._continueWrite = null
+    cb(null)
+  }
+
+  _write(data, cb) {
+    if (!this.#pipe.write(data)) this._continueWrite = cb
+    else cb(null)
+  }
+
+  _predestroy() {
+    this._ondrain()
+    this.#pipe.destroy(new Error('Stream destroyed'))
+  }
+
+  _final(cb) {
+    this.#pipe.end()
+    cb(null)
+  }
+
+  get autoexit() {
+    return this.#autoexit
+  }
+
+  set autoexit(v) {
+    this.#autoexit = v
+    this.#pipe.off('end', this.#onexit)
+    if (this.#autoexit) this.#pipe.once('end', this.#onexit)
   }
 }
 
@@ -61,7 +118,7 @@ if (isBareKit) exports.args = [...Bare.argv]
 else if (!isPear) exports.args = Bare.argv.slice(2)
 
 let PIPE = isMobile ? global.BareKit?.IPC ?? new ThreadPipe() : null
-module.exports = function pipe () {
+module.exports = function pipe() {
   if (PIPE !== null) return PIPE
   let attached
   try {
@@ -69,7 +126,8 @@ module.exports = function pipe () {
   } catch {
     attached = false
   }
-  if (attached === false) return null
-  PIPE = new PearPipe()
+  if (!!global?.process?.channel) return // spawned by Node.js with stdio ipc set on stdio[3]
+  if (attached === false && !isElectronRenderer) return null
+  PIPE = isElectronRenderer ? new PearElectronPipe() : new PearPipe()
   return PIPE
 }
