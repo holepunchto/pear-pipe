@@ -1,10 +1,9 @@
 'use strict'
-const { isWindows, isElectronRenderer, isBareKit, isPear, isIOS, isAndroid, isReactNative, isExpo } = require('which-runtime')
+const { isWindows, isElectronRenderer, isBareKit, isPear } = require('which-runtime')
 const { Duplex } = require('streamx')
 const Pipe = require('#pipe')
 const fs = require('fs')
 const FD = 3
-const isMobile = isIOS || isAndroid || isReactNative || isExpo
 
 class PearPipe extends Pipe {
   #onexit() {
@@ -89,7 +88,7 @@ class ThreadPipe {
   
   constructor () {
     const data = global.Bare?.Thread?.self?.data ?? null
-    if (data === null) throw new Error('Bare thread data should hold FDs')
+    if (data === null) throw new Error('Bare thread data should hold FDs for pipe construction')
     this.#readPipe = new Pipe(data._readFd)
     this.#writePipe = new Pipe(data._writeFd)
   }
@@ -118,7 +117,7 @@ class ThreadPipe {
 if (isBareKit) exports.args = [...global.Bare?.argv]
 else if (!isPear) exports.args = global.Bare?.argv.slice(2)
 
-let PIPE = isMobile ? global.BareKit?.IPC ?? new ThreadPipe() : null
+let PIPE = !isPear ? global.BareKit?.IPC ?? new ThreadPipe() : null // TODO: need different check when we add Pear global to mobile
 module.exports = function pipe() {
   if (PIPE !== null) return PIPE
   let attached
