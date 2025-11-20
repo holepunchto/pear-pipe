@@ -1,5 +1,10 @@
 'use strict'
-const { isWindows, isElectronRenderer, isBareKit, isPear } = require('which-runtime')
+const {
+  isWindows,
+  isElectronRenderer,
+  isBareKit,
+  isPear
+} = require('which-runtime')
 const { Duplex } = require('streamx')
 const Pipe = require('#pipe')
 const fs = require('fs')
@@ -85,10 +90,11 @@ class ThreadPipe {
   // TODO: add autoexit
   #readPipe
   #writePipe
-  
-  constructor () {
+
+  constructor() {
     const data = global.Bare?.Thread?.self?.data ?? null
-    if (data === null) throw new Error('Bare thread data should hold FDs for pipe construction')
+    if (data === null)
+      throw new Error('Bare thread data should hold FDs for pipe construction')
     this.#readPipe = new Pipe(data._readFd)
     this.#writePipe = new Pipe(data._writeFd)
   }
@@ -100,7 +106,7 @@ class ThreadPipe {
   write(data) {
     return this.#writePipe.write(data)
   }
-  
+
   // is this correct?
   destroy() {
     this.#readPipe.destroy()
@@ -111,13 +117,12 @@ class ThreadPipe {
     this.#writePipe.end()
     this.#readPipe.end()
   }
-
 }
 
 if (isBareKit) exports.args = [...global.Bare?.argv]
 else if (!isPear) exports.args = global.Bare?.argv.slice(2)
 
-let PIPE = !isPear ? global.BareKit?.IPC ?? new ThreadPipe() : null // TODO: need different check when we add Pear global to mobile
+let PIPE = !isPear ? (global.BareKit?.IPC ?? new ThreadPipe()) : null // TODO: need different check when we add Pear global to mobile
 module.exports = function pipe() {
   if (PIPE !== null) return PIPE
   let attached
