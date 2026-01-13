@@ -1,13 +1,10 @@
 'use strict'
-const {
-  isWindows,
-  isElectronRenderer,
-  isBareKit,
-  isPear
-} = require('which-runtime')
+const { isWindows, isElectronRenderer, isBareKit, isPear } = require('which-runtime')
 const { Duplex } = require('streamx')
+const { parentPort } = require('bare-worker')
 const Pipe = require('#pipe')
 const fs = require('fs')
+const b4a = require('b4a')
 const FD = 3
 
 class PearPipe extends Pipe {
@@ -86,45 +83,18 @@ class PearElectronPipe extends Duplex {
   }
 }
 
-class ThreadPipe {
-  // TODO: add autoexit
-  #readPipe
-  #writePipe
-
-  constructor() {
-    const data = global.Bare?.Thread?.self?.data ?? null
-    if (data === null)
-      throw new Error('Bare thread data should hold FDs for pipe construction')
-    this.#readPipe = new Pipe(data._readFd)
-    this.#writePipe = new Pipe(data._writeFd)
-  }
-
-  on(event, callback) {
-    return this.#readPipe.on(event, callback)
-  }
-
-  write(data) {
-    return this.#writePipe.write(data)
-  }
-
-  // is this correct?
-  destroy() {
-    this.#readPipe.destroy()
-    this.#writePipe.destroy()
-  }
-
-  end() {
-    this.#writePipe.end()
-    this.#readPipe.end()
-  }
-}
-
 if (isBareKit) exports.args = [...global.Bare?.argv]
 else if (!isPear) exports.args = global.Bare?.argv.slice(2)
 
-let PIPE = !isPear ? (global.BareKit?.IPC ?? new ThreadPipe()) : null // TODO: need different check when we add Pear global to mobile
+let PIPE = global.BareKit?.IPC ?? null
 module.exports = function pipe() {
   if (PIPE !== null) return PIPE
+  if (global.Pear?.isMobile) {
+    parentPort.write = (message) => parentPort.postMessage(b4a.from(message))
+    parentPort.on('message', (data) => parentPort.emit('data', data))
+    PIPE = parentPort
+    return PIPE
+  }
   let attached
   try {
     attached = isWindows ? !!fs.fstatSync(FD) : fs.fstatSync(FD).isSocket()
