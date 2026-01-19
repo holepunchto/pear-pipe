@@ -1,12 +1,9 @@
 'use strict'
-const { isWindows, isElectronRenderer, isBareKit, isPear } = require('which-runtime')
+const { isWindows, isElectronRenderer } = require('which-runtime')
 const { Duplex } = require('streamx')
-const { parentPort } = require('bare-worker')
 const Pipe = require('#pipe')
 const fs = require('fs')
-const b4a = require('b4a')
 const FD = 3
-
 class PearPipe extends Pipe {
   #onexit() {
     global.Pear.exit()
@@ -83,18 +80,9 @@ class PearElectronPipe extends Duplex {
   }
 }
 
-if (isBareKit) exports.args = [...global.Bare?.argv]
-else if (!isPear) exports.args = global.Bare?.argv.slice(2)
-
-let PIPE = global.BareKit?.IPC ?? null
+let PIPE = null
 module.exports = function pipe() {
   if (PIPE !== null) return PIPE
-  if (global.Pear?.isMobile) {
-    parentPort.write = (message) => parentPort.postMessage(b4a.from(message))
-    parentPort.on('message', (data) => parentPort.emit('data', data))
-    PIPE = parentPort
-    return PIPE
-  }
   let attached
   try {
     attached = isWindows ? !!fs.fstatSync(FD) : fs.fstatSync(FD).isSocket()

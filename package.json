@@ -7,7 +7,8 @@
   "license": "Apache-2.0",
   "files": [
     "bare/",
-    "node/"
+    "node/",
+    "index.mobile.js"
   ],
   "scripts": {
     "format": "prettier --write .",
@@ -16,6 +17,13 @@
     "test": "npm run test:bare && npm run test:node",
     "test:bare": "brittle-bare --coverage test/all.js",
     "test:node": "brittle-node --coverage test/all.js"
+  },
+  "exports": {
+    ".": {
+      "pear-mobile": "./index.mobile.js",
+      "default": "./index.js"
+    },
+    "./package": "./package.json"
   },
   "imports": {
     "#pipe": {
